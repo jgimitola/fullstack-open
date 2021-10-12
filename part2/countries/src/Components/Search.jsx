@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import Result from "./Result";
 
 const Search = ({ all, setInfo }) => {
   const [term, setTerm] = useState("");
   const [results, setResults] = useState([]);
 
-  const handleInput = (e) => {
-    const updatedTerm = e.target.value;
-
-    if (updatedTerm.length > 0) {
+  const filterDisplay = () => {
+    if (term.length > 0) {
       const filtered = all.filter(({ name: { common } }) =>
-        common.toLowerCase().includes(updatedTerm)
+        common.toLowerCase().includes(term)
       );
 
       if (filtered.length === 0) setInfo({});
@@ -30,7 +30,12 @@ const Search = ({ all, setInfo }) => {
       setInfo({});
       setResults([]);
     }
-    setTerm(updatedTerm);
+  };
+
+  useEffect(filterDisplay, [all, setInfo, term]);
+
+  const handleInput = (e) => {
+    setTerm(e.target.value);
   };
 
   return (
@@ -44,7 +49,7 @@ const Search = ({ all, setInfo }) => {
       {results.length > 0 && results.length < 10 && (
         <ul>
           {results.map(({ name: { common } }) => (
-            <li key={`r-${common}`}>{common}</li>
+            <Result key={`r-${common}`} text={common} setTerm={setTerm} />
           ))}
         </ul>
       )}
