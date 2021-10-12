@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-const Search = ({ all, term, setTerm, setInfo }) => {
+const Search = ({ all, setInfo }) => {
+  const [term, setTerm] = useState("");
   const [results, setResults] = useState([]);
 
   const handleInput = (e) => {
@@ -10,6 +11,8 @@ const Search = ({ all, term, setTerm, setInfo }) => {
       const filtered = all.filter(({ name: { common } }) =>
         common.toLowerCase().includes(updatedTerm)
       );
+
+      if (filtered.length === 0) setInfo({});
       if (filtered.length === 1) {
         const match = filtered[0];
 
@@ -35,14 +38,15 @@ const Search = ({ all, term, setTerm, setInfo }) => {
       <label htmlFor="searchbar">find countries: </label>
       <input type="search" id="searchbar" value={term} onChange={handleInput} />
 
-      {results.length >= 0 && results.length < 10 ? (
+      {results.length === 0 && <p>There are no results, try another filter.</p>}
+      {results.length >= 10 && <p>Too many matches, specify another filter</p>}
+
+      {results.length > 0 && results.length < 10 && (
         <ul>
           {results.map(({ name: { common } }) => (
             <li key={`r-${common}`}>{common}</li>
           ))}
         </ul>
-      ) : (
-        <p>Too many matches, specify another filter</p>
       )}
     </div>
   );

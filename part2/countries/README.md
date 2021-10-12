@@ -2,4 +2,5 @@
 
 Time of each session
 
-1. 3:04 pm
+1. 98 minutes
+2. 8:58 am

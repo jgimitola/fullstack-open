@@ -6,7 +6,6 @@ import CountryInfo from "./CountryInfo";
 
 const App = () => {
   const [info, setInfo] = useState({});
-  const [term, setTerm] = useState("");
   const [all, setAll] = useState([]);
 
   useEffect(() => {
@@ -17,7 +16,7 @@ const App = () => {
 
   return (
     <div>
-      <Search all={all} term={term} setTerm={setTerm} setInfo={setInfo} />
+      <Search all={all} setInfo={setInfo} />
       {Object.keys(info).length > 0 && <CountryInfo info={info} />}
     </div>
   );
