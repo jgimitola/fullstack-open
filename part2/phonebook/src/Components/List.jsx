@@ -1,6 +1,11 @@
 import Person from "./Person";
 
-const List = ({ filteredPersons, stateModifiers, persons }) => (
+const List = ({
+  filteredPersons,
+  stateModifiers,
+  persons,
+  showErrorMessage,
+}) => (
   <div>
     {filteredPersons.map(({ id, name, number }) => (
       <Person
@@ -10,6 +15,7 @@ const List = ({ filteredPersons, stateModifiers, persons }) => (
         number={number}
         stateModifiers={stateModifiers}
         persons={persons}
+        showErrorMessage={showErrorMessage}
       />
     ))}
   </div>

@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
+import "./index.css";
 
 import contactService from "./services/contactService";
 
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import List from "./Components/List";
+import Message from "./Components/Message";
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
+  const [successMessage, setSuccessMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
+  const [persons, setPersons] = useState([]);
   const [filteredPersons, setFilteredPersons] = useState([]);
 
   const [newName, setNewName] = useState("");
@@ -21,6 +25,20 @@ const App = () => {
       setFilteredPersons(fetchedPersons);
     });
   }, []);
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 2500);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 2500);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -37,6 +55,8 @@ const App = () => {
         setPersons(newPersons);
         setFilteredPersons([...newPersons]);
         setFilter("");
+
+        showSuccessMessage(`${newPerson.name} has been added.`);
       });
     } else {
       if (
@@ -52,6 +72,10 @@ const App = () => {
           setPersons(newPersons);
           setFilteredPersons([...newPersons]);
           setFilter("");
+
+          showSuccessMessage(
+            `${updatedPerson.name}'s number has been updated.`
+          );
         });
       }
     }
@@ -75,6 +99,9 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
 
+      <Message type="success" message={successMessage} />
+      <Message type="error" message={errorMessage} />
+
       <Filter filter={filter} handleChangeFilter={handleChangeFilter} />
 
       <h2>add a new</h2>
@@ -96,6 +123,7 @@ const App = () => {
         filteredPersons={filteredPersons}
         persons={persons}
         stateModifiers={{ setPersons, setFilteredPersons }}
+        showErrorMessage={showErrorMessage}
       />
     </div>
   );
