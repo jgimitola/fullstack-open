@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 
-import Filter from "./Filter";
-import PersonForm from "./PersonForm";
-import Persons from "./Persons";
+import contactService from "./services/contactService";
+
+import Filter from "./Components/Filter";
+import PersonForm from "./Components/PersonForm";
+import List from "./Components/List";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -15,42 +16,52 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then(({ data }) => {
-      setPersons(data);
-      setFilteredPersons(data);
+    contactService.getAll().then((fetchedPersons) => {
+      setPersons(fetchedPersons);
+      setFilteredPersons(fetchedPersons);
     });
   }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const newPersons = [
-      ...persons,
-      { name: newName, number: newNumber, id: persons.length + 1 },
-    ];
+    const position = persons.findIndex((p) => p.name === newName);
+    if (position === -1) {
+      const newPerson = {
+        name: newName,
+        number: newNumber,
+        id: persons.length + 1,
+      };
 
-    if (persons.findIndex((p) => p.name === newName) === -1) {
-      setPersons(newPersons);
-      setFilteredPersons([...newPersons]);
-      setFilter("");
+      contactService.create(newPerson).then(() => {
+        const newPersons = [...persons, newPerson];
+        setPersons(newPersons);
+        setFilteredPersons([...newPersons]);
+        setFilter("");
+      });
     } else {
-      alert(`${newName} is already added to phonebook`);
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const updatedPerson = { ...persons[position], number: newNumber };
+        contactService.update(updatedPerson).then((data) => {
+          const newPersons = persons.map((p) =>
+            p.id !== updatedPerson.id ? p : updatedPerson
+          );
+          setPersons(newPersons);
+          setFilteredPersons([...newPersons]);
+          setFilter("");
+        });
+      }
     }
     setNewName("");
     setNewNumber("");
   };
 
-  const handleChangeName = (event) => {
-    setNewName(event.target.value);
-  };
-
-  const handleChangeNumber = (event) => {
-    setNewNumber(event.target.value);
-  };
-
   const handleChangeFilter = (event) => {
     const fil = event.target.value;
     if (fil.length > 0) {
-      console.log(fil);
       setFilteredPersons(
         persons.filter((p) => p.name.toLowerCase().includes(fil))
       );
@@ -71,13 +82,21 @@ const App = () => {
       <PersonForm
         newName={newName}
         newNumber={newNumber}
-        handleChangeName={handleChangeName}
-        handleChangeNumber={handleChangeNumber}
+        handleChangeName={(event) => {
+          setNewName(event.target.value);
+        }}
+        handleChangeNumber={(event) => {
+          setNewNumber(event.target.value);
+        }}
         handleSubmit={handleSubmit}
       />
 
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <List
+        filteredPersons={filteredPersons}
+        persons={persons}
+        stateModifiers={{ setPersons, setFilteredPersons }}
+      />
     </div>
   );
 };
