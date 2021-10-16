@@ -46,8 +46,7 @@ const App = () => {
     if (position === -1) {
       const newPerson = {
         name: newName,
-        number: newNumber,
-        id: persons.length + 1,
+        number: newNumber,        
       };
 
       contactService.create(newPerson).then(() => {
