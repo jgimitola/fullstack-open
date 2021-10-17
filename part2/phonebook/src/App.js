@@ -46,17 +46,22 @@ const App = () => {
     if (position === -1) {
       const newPerson = {
         name: newName,
-        number: newNumber,        
+        number: newNumber,
       };
 
-      contactService.create(newPerson).then(() => {
-        const newPersons = [...persons, newPerson];
-        setPersons(newPersons);
-        setFilteredPersons([...newPersons]);
-        setFilter("");
+      contactService
+        .create(newPerson)
+        .then(() => {
+          const newPersons = [...persons, newPerson];
+          setPersons(newPersons);
+          setFilteredPersons([...newPersons]);
+          setFilter("");
 
-        showSuccessMessage(`${newPerson.name} has been added.`);
-      });
+          showSuccessMessage(`${newPerson.name} has been added.`);
+        })
+        .catch((error) => {
+          showErrorMessage(error.response.data.error);
+        });
     } else {
       if (
         window.confirm(
@@ -64,18 +69,23 @@ const App = () => {
         )
       ) {
         const updatedPerson = { ...persons[position], number: newNumber };
-        contactService.update(updatedPerson).then((data) => {
-          const newPersons = persons.map((p) =>
-            p.id !== updatedPerson.id ? p : updatedPerson
-          );
-          setPersons(newPersons);
-          setFilteredPersons([...newPersons]);
-          setFilter("");
+        contactService
+          .update(updatedPerson)
+          .then((data) => {
+            const newPersons = persons.map((p) =>
+              p.id !== updatedPerson.id ? p : updatedPerson
+            );
+            setPersons(newPersons);
+            setFilteredPersons([...newPersons]);
+            setFilter("");
 
-          showSuccessMessage(
-            `${updatedPerson.name}'s number has been updated.`
-          );
-        });
+            showSuccessMessage(
+              `${updatedPerson.name}'s number has been updated.`
+            );
+          })
+          .catch((error) => {
+            showErrorMessage(error.response.data.error);
+          });
       }
     }
     setNewName("");

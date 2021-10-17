@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -10,9 +11,11 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: { type: String, unique: true, minlength: 3 },
+  number: { type: String, minlength: 8 },
 });
+
+personSchema.plugin(uniqueValidator);
 
 personSchema.set("toJSON", {
   transform: (document, returnedObject) => {
@@ -20,6 +23,16 @@ personSchema.set("toJSON", {
     delete returnedObject._id;
     delete returnedObject.__v;
   },
+});
+
+process.on("SIGINT", () => {
+  console.log("Closing connection...");
+  mongoose.disconnect().then(() => {
+    console.log(
+      `Connection is closed. State is: ${mongoose.connection.readyState}`
+    );
+    process.exit(0);
+  });
 });
 
 module.exports = mongoose.model("Person", personSchema);

@@ -34,19 +34,18 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const person = new Person(req.body);
+
   if (!person.name || !person.number) {
     res.status(400).json({ error: "Name and number must be sent" });
   } else {
-    const exists = false;
-    if (!exists) {
-      person.save().then(() => {
+    person
+      .save()
+      .then(() => {
         res.status(201).json(person);
-      });
-    } else {
-      res.status(409).json({ error: "Name must be unique" });
-    }
+      })
+      .catch((error) => next(error));
   }
 });
 
@@ -67,7 +66,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 app.put("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
-  Person.findByIdAndUpdate(id, req.body, { new: true })
+  Person.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
     .then((person) => {
       if (person) {
         res.json(person);
@@ -96,7 +95,9 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
   if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformatted id" });
+    return response.status(400).json({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
   next(error);
 };

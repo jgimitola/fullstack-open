@@ -1,5 +1,7 @@
 # phonebook api
 
+API and sever for phonebook project. See live version on [Heroku](https://fullstack-phonebook-server.herokuapp.com)
+
 Time of each session
 
 1. 83 mins
@@ -8,3 +10,4 @@ Time of each session
 4. 40 mins
 5. 41 mins
 6. 23 mins
+7. 81 mins
